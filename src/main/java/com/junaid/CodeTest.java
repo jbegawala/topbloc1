@@ -3,6 +3,7 @@ package com.junaid;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
@@ -68,20 +69,27 @@ public class CodeTest
 		json.put("wordSetOne", new JSONArray(Arrays.asList(wordSetOneConcatenation)));
 
 		HttpClient httpClient = HttpClients.createDefault();
-		//HttpPost request = new HttpPost("http://34.239.125.159:5000/challenge");
-		HttpPost request = new HttpPost("http://192.168.1.208:5000");
+		HttpPost request = new HttpPost("http://34.239.125.159:5000/challenge");
 		request.addHeader("content-type", "application/json");
 		request.setEntity(new StringEntity(json.toString(), "UTF-8"));
 
-		HttpResponse response = httpClient.execute(request);
-		int responseCode = response.getStatusLine().getStatusCode();
-		if ( responseCode == 200 )
+		HttpResponse response;
+		try
 		{
-			System.out.println("Posted successfully");
+			response = httpClient.execute(request);
+			int responseCode = response.getStatusLine().getStatusCode();
+			if ( responseCode == 200 )
+			{
+				System.out.println("Posted successfully");
+			}
+			else
+			{
+				System.out.println("Failed to post (status code " + response +")");
+			}
 		}
-		else
+		catch(HttpHostConnectException e)
 		{
-			System.out.println("Failed to post (status code " + response +")");
+			System.out.println("An error occurred while attempting to connect: " + e.getMessage() +")");
 		}
 	}
 
